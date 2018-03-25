@@ -17,7 +17,7 @@ int main() {
     float hopping               = -0.25;
     float inversive_temperature = 10.0;
     int number_of_frequencies   = 10; // number of frequencies
-    int number_of_sites         = 4;
+    int number_of_sites         = 100;
 
     Data data;
     data.init_parameters(local_coulomb, nonlocal_exchange,
@@ -28,66 +28,66 @@ int main() {
 
     data.frequencies();
     data.construct_connections();
-
-    data.construct_hopping_matrix();
-    data.print_hopping_matrix();
-
-    data.construct_U_matrix();
-    data.print_U_matrix();
-
-    /* Initial lattice Green's function */
-    Calculation calculation(data);
-
-    cout << "Zero iteration." << endl;
-
-    /* G0 */
-    calculation.construct_initial_lattice_function();
-    calculation.inverse_matrix_to_G0();
-
-    /* GF = G0 */
-    calculation.GF_takes_GO();
-    calculation.inverse_matrix_GF();
-
-    /* Sigma */
-    cout << "Sigma computing..." << endl;
-    calculation.compute_Sigma();
-
-    /* G_final */
-    cout << "Dyson equation..." << endl;
-    calculation.Dyson_equation();
-    calculation.inverse_matrix_to_GF_final();
-
-    cout << "Start cycle" << endl;
-    int number_of_iterations = 10;
-
-    while(calculation.test_convergency() == false){
-        cout << "Iteration number " << iteration << endl;
-
-        /* GF = GF_final*/
-        calculation.GF_takes_GF_final(); /* and inversive matrix too*/
-
-        /* Sigma */
-        cout << "Sigma computing..." << endl;
-        calculation.compute_Sigma();
-
-        /* GF_final */
-        cout << "Dyson equation..." << endl;
-        calculation.Dyson_equation();
-        calculation.inverse_matrix_to_GF_final();
-
-        calculation.print_Sigma_in_file();
-        calculation.print_GF_in_file();
-        iteration += 1;
-
-    }
-
-    calculation.print_GF0_in_file();
-    cout << "Total number of iterations = " << iteration << endl;
-
-    /*Memory clean block*/
-    data.clear_memory_t_matrix();
-    //calculation.clean_memory_GF();
-
+//
+//    data.construct_hopping_matrix();
+//    data.print_hopping_matrix();
+//
+//    data.construct_U_matrix();
+//    data.print_U_matrix();
+//
+//    /* Initial lattice Green's function */
+//    Calculation calculation(data);
+//
+//    cout << "Zero iteration." << endl;
+//
+//    /* G0 */
+//    calculation.construct_initial_lattice_function();
+//    calculation.inverse_matrix_to_G0();
+//
+//    /* GF = G0 */
+//    calculation.GF_takes_GO();
+//    calculation.inverse_matrix_GF();
+//
+//    /* Sigma */
+//    cout << "Sigma computing..." << endl;
+//    calculation.compute_Sigma();
+//
+//    /* G_final */
+//    cout << "Dyson equation..." << endl;
+//    calculation.Dyson_equation();
+//    calculation.inverse_matrix_to_GF_final();
+//
+//    cout << "Start cycle" << endl;
+//    int number_of_iterations = 10;
+//
+//    while(calculation.test_convergency() == false){
+//        cout << "Iteration number " << iteration << endl;
+//
+//        /* GF = GF_final*/
+//        calculation.GF_takes_GF_final(); /* and inversive matrix too*/
+//
+//        /* Sigma */
+//        cout << "Sigma computing..." << endl;
+//        calculation.compute_Sigma();
+//
+//        /* GF_final */
+//        cout << "Dyson equation..." << endl;
+//        calculation.Dyson_equation();
+//        calculation.inverse_matrix_to_GF_final();
+//
+//        calculation.print_Sigma_in_file();
+//        calculation.print_GF_in_file();
+//        iteration += 1;
+//
+//    }
+//
+//    calculation.print_GF0_in_file();
+//    cout << "Total number of iterations = " << iteration << endl;
+//
+//    /*Memory clean block*/
+//    data.clear_memory_t_matrix();
+//    //calculation.clean_memory_GF();
+//
     cout << "END" << endl;
     return 0;
 }

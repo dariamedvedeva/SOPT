@@ -17,7 +17,7 @@ private:
     float U, J, t, mu, beta;
     int N;
     int number_of_sites, number_of_spins = 2;
-    map<int, vector<int> > connections, connections_10_10;
+    map<int, vector<int> > connections;
     complex<float> **t_matrix, *omega, *nu, ****U_matrix;
 
 public:
@@ -84,17 +84,51 @@ public:
     }
 
     void construct_connections(){
-        /* It's a numeric magic, dude) */
-        vector<int> con1 = {1, 2};
-        vector<int> con2 = {0, 3};
-        vector<int> con3 = {0, 3};
-        vector<int> con4 = {1, 2};
-        connections =  { {0, con1}, {1, con2}, {2, con3}, {3, con4} };
-    }
-
-    void construct_connection_10_10(){
-        /* Lattice 10 x 10*/
-        
+        if (get_number_of_sites()  == 2){
+            vector<int> con1 = {1, 2};
+            vector<int> con2 = {0, 3};
+            vector<int> con3 = {0, 3};
+            vector<int> con4 = {1, 2};
+            connections =  { {0, con1}, {1, con2}, {2, con3}, {3, con4} };
+        } else if(get_number_of_sites() == 100) {
+            /* It's a numeric magic, dude) */
+            typedef pair <const int, vector<int>> Int_Pair;
+            for(int i = 0; i < get_number_of_sites(); i++){
+                vector<int> temp(4);
+                cout << "site: " << i << ":\t";
+                //if (temp.empty()) {
+                    for (int j = 0; j < get_number_of_sites(); j++) {
+                        /* bottom and top neighbours */
+                        if ((j % 10 == i % 10) & (abs(i / 10 - j / 10) == 1)) {
+                            // cout << j << " ";
+                            temp.insert(temp.end(), j);
+                            /* neighbours from the left and from the ride sides */
+                        } else if (abs(i - j) == 1 & i / 10 == j / 10) {
+                            // cout << j << " ";
+                            temp.insert(temp.end(), j);
+                            /* bottom and top lines */
+                        } else if (abs(i - j) == 90) {
+                            // cout << j << " ";
+                            temp.insert(temp.end(), j);
+                            /* left and right boundaries */
+                        } else if ((abs(i - j) == 9) & (i / 10 == j / 10) & (i % 10 == 0 || i % 10 == 9)) {
+                            // cout << j << " ";
+                            temp.insert(temp.end(), j);
+                        }
+                    }
+               // }
+             //   cout << temp.data() << " ";
+                cout << endl;
+                connections.insert(Int_Pair (i, temp));
+             //   temp.clear();
+            }
+        }
+        cout << "Test connections" << endl;
+        for (auto it = connections.begin(); it != connections.end(); ++it) {
+            for (int p = 0; p < 4; p++) {
+                cout << it->first << " : " << it->second.data()[p]<< endl;
+            }
+        }
     }
 
     void clear_memory_t_matrix(){
