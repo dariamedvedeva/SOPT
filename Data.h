@@ -59,10 +59,10 @@ public:
         for(int i = 0; i < get_number_of_sites(); i++) {
             t_matrix[i] = new complex<float>[get_number_of_sites()];
         }
-        for (int i = 0; i < get_number_of_sites(); i++){
-            for(int j = 0; j < get_number_of_sites(); j++){
+        for (int i = 0; i < connections.size(); i++){
+            for(int j = 0; j < connections.size(); j++){
                 if (i != j){
-                    for (int p = 0; p < sqrt(get_number_of_sites()); p++) {
+                    for (int p = 0; p < connections.at(i).size(); p++) {
                         if (j == connections.at(i).at(p)) {
                             t_matrix[i][j] = complex<float> (get_t(), 0.0);
                         }
@@ -84,50 +84,56 @@ public:
     }
 
     void construct_connections(){
-        if (get_number_of_sites()  == 2){
+        if (get_number_of_sites()  == 4){
             vector<int> con1 = {1, 2};
             vector<int> con2 = {0, 3};
             vector<int> con3 = {0, 3};
             vector<int> con4 = {1, 2};
+
             connections =  { {0, con1}, {1, con2}, {2, con3}, {3, con4} };
         } else if(get_number_of_sites() == 100) {
             /* It's a numeric magic, dude) */
             typedef pair <const int, vector<int>> Int_Pair;
             for(int i = 0; i < get_number_of_sites(); i++){
-                vector<int> temp(4);
-                cout << "site: " << i << ":\t";
-                //if (temp.empty()) {
+                vector<int> temp;
+               // cout << "site: " << i << ":\t";
+                if (temp.empty()) {
                     for (int j = 0; j < get_number_of_sites(); j++) {
                         /* bottom and top neighbours */
                         if ((j % 10 == i % 10) & (abs(i / 10 - j / 10) == 1)) {
                             // cout << j << " ";
-                            temp.insert(temp.end(), j);
+                            temp.push_back(j);
                             /* neighbours from the left and from the ride sides */
                         } else if (abs(i - j) == 1 & i / 10 == j / 10) {
                             // cout << j << " ";
-                            temp.insert(temp.end(), j);
+                            temp.push_back(j);
                             /* bottom and top lines */
                         } else if (abs(i - j) == 90) {
                             // cout << j << " ";
-                            temp.insert(temp.end(), j);
+                            temp.push_back(j);
                             /* left and right boundaries */
                         } else if ((abs(i - j) == 9) & (i / 10 == j / 10) & (i % 10 == 0 || i % 10 == 9)) {
                             // cout << j << " ";
-                            temp.insert(temp.end(), j);
+                            temp.push_back(j);
                         }
                     }
-               // }
-             //   cout << temp.data() << " ";
-                cout << endl;
-                connections.insert(Int_Pair (i, temp));
-             //   temp.clear();
+                    sort(temp.begin(), temp.end());
+                    connections.insert(Int_Pair(i, temp));
+                    temp.clear();
+                }
             }
         }
-        cout << "Test connections" << endl;
+    }
+
+    void print_connections(){
+        cout << "Print connections" << endl;
+        cout << "cite" << "\t neighbours" << endl;
         for (auto it = connections.begin(); it != connections.end(); ++it) {
-            for (int p = 0; p < 4; p++) {
-                cout << it->first << " : " << it->second.data()[p]<< endl;
+            cout << it->first << " : {";
+            for (vector<int>::const_iterator arr = it->second.begin(); arr != it->second.end(); ++arr) {
+                cout << *arr << " ";
             }
+            cout << "}" << endl;
         }
     }
 
@@ -148,7 +154,7 @@ public:
     }
 
     void construct_U_matrix() {
-        int lat_s = get_number_of_sites();
+        int lat_s = connections.size();
 
         U_matrix = new complex<float> ***[lat_s];
         for (int i = 0; i < lat_s; i++) {
@@ -160,7 +166,7 @@ public:
                     for (int l = 0; l < lat_s; l++) {
                         U_matrix[i][j][k][l] = complex<float>(get_J(), 0.0);
                         if ((i == k) & (j == l) & (i != j)) {
-                            for (int p = 0; p < sqrt(get_number_of_sites()); p++) {
+                            for (int p = 0; p < connections.at(i).size(); p++) {
                                 if (j == connections.at(i).at(p)) {
                                     U_matrix[i][j][k][l] = complex<float>(get_J(), 0.0);
                                     /* Works */
@@ -180,7 +186,8 @@ public:
     }
 
     void print_U_matrix(){
-        int lat_s = get_number_of_sites();
+        int lat_s = connections.size();
+        cout << "connections size" << connections.size() << endl;
         cout << "U matrix:" << endl;
         for(int i = 0; i < lat_s; i++){
             for (int j = 0; j < lat_s; j++){
@@ -190,7 +197,7 @@ public:
                             cout << "Local: \t\t[" << i << "][" << j << "][" << k << "][" << l << "] = " << U_matrix[i][j][k][l] << endl;
                         }
                         if ((i == k) & (j == l) & (i != j)){
-                            for (int p = 0; p < sqrt(get_number_of_sites()); p++) {
+                            for (int p = 0; p < connections.at(i).size(); p++) {
                                 if (j == connections.at(i).at(p)) {
                                     cout << "Nonlocal: \t[" << i << "][" << j << "][" << k << "][" << l << "] = "
                                          << U_matrix[i][j][k][l] << endl;
