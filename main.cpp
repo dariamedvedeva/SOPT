@@ -10,14 +10,14 @@ int main() {
 
     int iteration = 0;
 
-    /* Parametrs */
+    /* Parameters */
     float local_coulomb         = 1.0;
     float nonlocal_exchange     = 0.05;
     float chemical_potential    = local_coulomb / 2.0;
     float hopping               = -0.25;
     float inversive_temperature = 10.0;
     int number_of_frequencies   = 10; // number of frequencies
-    int number_of_sites         = 100;
+    int number_of_sites         = 4;
 
     Data data;
     data.init_parameters(local_coulomb, nonlocal_exchange,
@@ -28,10 +28,10 @@ int main() {
 
     data.frequencies();
     data.construct_connections();
-//    data.print_connections();
+    data.print_connections();
 
     data.construct_hopping_matrix();
-//    data.print_hopping_matrix();
+    data.print_hopping_matrix();
 
     data.construct_U_matrix();
     data.print_U_matrix();
@@ -43,25 +43,25 @@ int main() {
 
     /* G0 */
     calculation.construct_initial_lattice_function();
-    calculation.inverse_matrix_to_G0();
 
     /* GF = G0 */
     calculation.GF_takes_GO();
-    calculation.inverse_matrix_GF();
 
     /* Sigma */
     cout << "Sigma computing..." << endl;
     calculation.compute_Sigma();
+    calculation.print_Sigma_in_file();
 
     /* G_final */
     cout << "Dyson equation..." << endl;
     calculation.Dyson_equation();
-    calculation.inverse_matrix_to_GF_final();
+
+    calculation.print_GF_in_file();
+    calculation.print_GF0_in_file();
 
     cout << "Start cycle" << endl;
-    int number_of_iterations = 10;
-
     while(calculation.test_convergency() == false){
+        iteration += 1;
         cout << "Iteration number " << iteration << endl;
 
         /* GF = GF_final*/
@@ -70,25 +70,20 @@ int main() {
         /* Sigma */
         cout << "Sigma computing..." << endl;
         calculation.compute_Sigma();
-
         /* GF_final */
         cout << "Dyson equation..." << endl;
         calculation.Dyson_equation();
-        calculation.inverse_matrix_to_GF_final();
-
-        calculation.print_Sigma_in_file();
-        calculation.print_GF_in_file();
-        iteration += 1;
-
     }
 
+
+    calculation.print_Sigma_in_file();
+    calculation.print_GF_in_file();
     calculation.print_GF0_in_file();
     cout << "Total number of iterations = " << iteration << endl;
+    data.clear_memory_t_matrix();
 
     /*Memory clean block*/
-    data.clear_memory_t_matrix();
     //calculation.clean_memory_GF();
-
     cout << "END" << endl;
     return 0;
 }

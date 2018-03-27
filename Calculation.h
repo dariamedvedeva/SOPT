@@ -44,13 +44,13 @@ public:
         lat_s = data.get_number_of_sites();
         omega_length = data.get_number_of_freq();
 
-        GF              = new complex<float> ***[number_of_spins];
-        GF_inversive        = new complex<float> ***[number_of_spins];
-        GF0              = new complex<float> ***[number_of_spins];
-        GF0_inversive   = new complex<float> ***[number_of_spins];
-        Sigma           = new complex<float> ***[number_of_spins];
-        GF_final_inversive        = new complex<float> ***[number_of_spins];
-        GF_final        = new complex<float> ***[number_of_spins];
+        GF                          = new complex<float> ***[number_of_spins];
+        GF_inversive                = new complex<float> ***[number_of_spins];
+        GF0                         = new complex<float> ***[number_of_spins];
+        GF0_inversive               = new complex<float> ***[number_of_spins];
+        Sigma                       = new complex<float> ***[number_of_spins];
+        GF_final_inversive          = new complex<float> ***[number_of_spins];
+        GF_final                    = new complex<float> ***[number_of_spins];
 
         for (int spin = 0; spin < number_of_spins; spin++) {
             GF[spin] = new complex<float> **[lat_s];
@@ -130,6 +130,7 @@ public:
                 }
             }
         }
+        inverse_matrix_to_G0();
     }
 
 
@@ -139,7 +140,7 @@ public:
 
     bool test_convergency() {
         compare_GF();
-        if (abs(GF[0][0][0][0].imag() - GF_final[0][0][0][0].imag()) < 0.001) {
+        if (abs(GF[0][0][0][0].imag() - GF_final[0][0][0][0].imag()) < 0.0001) {
             return true;
         } else {
             return false;
@@ -147,18 +148,27 @@ public:
     }
 
     void GF_takes_GO() {
-        GF = GF0;
-        GF_inversive = GF0_inversive;
+        for (int spin = 0; spin < number_of_spins; spin++) {
+            for (int i = 0; i < lat_s; i++) {
+                for (int j = 0; j < lat_s; j++) {
+                    for (int freq = 0; freq < omega_length; freq++) {
+                        GF[spin][i][j][freq]            = GF0[spin][i][j][freq];
+                        GF_inversive[spin][i][j][freq]  = GF0_inversive[spin][i][j][freq];
+                    }
+                }
+            }
+        }
+        set_to_zero_GF_final();
     }
 
     void compute_Sigma() {
         int lat_s, len_ferm_freq, len_bos_freq, number_of_spins;
         int new_freq, new_freq_2;
         complex<float> GF_tail_kl, GF_tail_qp, GF_tail_km, GF_left_shift;
-        GF_tail_kl      = complex<float> (0.0, 0.0);
-        GF_tail_qp      = complex<float> (0.0, 0.0);
-        GF_tail_km      = complex<float> (0.0, 0.0);
-        GF_left_shift   = complex<float> (0.0, 0.0);
+        GF_tail_kl = complex<float>(0.0, 0.0);
+        GF_tail_qp = complex<float>(0.0, 0.0);
+        GF_tail_km = complex<float>(0.0, 0.0);
+        GF_left_shift = complex<float>(0.0, 0.0);
         lat_s = data.get_number_of_sites();
         len_ferm_freq = data.get_number_of_freq();
         len_bos_freq = data.get_number_of_freq();
@@ -196,7 +206,7 @@ public:
                                         GF_tail_kl = complex<float>(1.0, 0.0) / data.fermionic_matsubara(new_freq);
                                     }
                                     Sigma[spin][i][j][omega_n] -= data.get_U_matrix()[i][k][j][l] * GF_tail_kl;
-                                    GF_tail_kl = complex<float> (0.0, 0.0);
+                                    GF_tail_kl = complex<float>(0.0, 0.0);
                                 }
                             }
                         }
@@ -235,8 +245,8 @@ public:
                                                                     GF[spin_prime][n][m][omega_n_prime] /
                                                                     complex<float>(pow(beta, 2), 0.0);
 
-                                                            GF_tail_kl = complex<float> (0.0, 0.0);
-                                                            GF_tail_qp = complex<float> (0.0, 0.0);
+                                                            GF_tail_kl = complex<float>(0.0, 0.0);
+                                                            GF_tail_qp = complex<float>(0.0, 0.0);
                                                         }
                                                     }
                                                 }
@@ -286,9 +296,10 @@ public:
                     }
                 }
             }
+            cout << "Sigma spin " << spin << " is done." << endl;
         }
-
     }
+
 
     void Dyson_equation() {
         for (int spin = 0; spin < number_of_spins; spin++) {
@@ -300,11 +311,34 @@ public:
                 }
             }
         }
+        inverse_matrix_to_GF_final();
     }
 
     void GF_takes_GF_final() {
-        GF              = GF_final;
-        GF_inversive    = GF_final_inversive;
+        for (int spin = 0; spin < number_of_spins; spin++) {
+            for (int i = 0; i < lat_s; i++) {
+                for (int j = 0; j < lat_s; j++) {
+                    for (int freq = 0; freq < omega_length; freq++) {
+                        GF[spin][i][j][freq]            = GF_final[spin][i][j][freq];
+                        GF_inversive[spin][i][j][freq]  = GF_final_inversive[spin][i][j][freq];
+                    }
+                }
+            }
+        }
+        set_to_zero_GF_final();
+    }
+
+    void set_to_zero_GF_final(){
+        for (int spin = 0; spin < number_of_spins; spin++) {
+            for (int i = 0; i < lat_s; i++) {
+                for (int j = 0; j < lat_s; j++) {
+                    for (int freq = 0; freq < omega_length; freq++) {
+                        GF_final_inversive[spin][i][j][freq]    = complex<float>(0.0, 0.0);
+                        GF_final[spin][i][j][freq]              = complex<float>(0.0, 0.0);
+                    }
+                }
+            }
+        }
     }
 
     void print_Sigma_in_file() {
@@ -458,11 +492,6 @@ public:
                 }
             }
         }
-
-        inverted = InvertMatrix(start_matrix, inversion);
-//        cout << start_matrix << endl;
-//        cout << inversion << endl;
-
     }
 
     void inverse_matrix_to_GF_final(){
@@ -487,11 +516,6 @@ public:
                 }
             }
         }
-
-        inverted = InvertMatrix(start_matrix, inversion);
-//        cout << start_matrix << endl;
-//        cout << inversion << endl;
-
     }
 
     void inverse_matrix_GF(){
@@ -516,11 +540,6 @@ public:
                 }
             }
         }
-
-        inverted = InvertMatrix(start_matrix, inversion);
-//        cout << start_matrix << endl;
-//        cout << inversion << endl;
-
     }
 };
 

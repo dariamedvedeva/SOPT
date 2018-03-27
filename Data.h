@@ -91,6 +91,17 @@ public:
             vector<int> con4 = {1, 2};
 
             connections =  { {0, con1}, {1, con2}, {2, con3}, {3, con4} };
+        } else if(get_number_of_sites()  == 9) {
+            vector<int> con0 = {1, 2, 3, 6};
+            vector<int> con1 = {0, 2, 4, 7};
+            vector<int> con2 = {0, 1, 5, 8};
+            vector<int> con3 = {0, 4, 5, 6};
+            vector<int> con4 = {1, 3, 5, 7};
+            vector<int> con5 = {2, 3, 4, 8};
+            vector<int> con6 = {0, 3, 7, 8};
+            vector<int> con7 = {1, 4, 6, 8};
+            vector<int> con8 = {2, 5, 6, 7};
+            connections =  { {0, con0}, {1, con1}, {2, con2}, {3, con3}, {4, con4}, {5, con5}, {6, con6}, {7, con7}, {8, con8} };
         } else if(get_number_of_sites() == 100) {
             /* It's a numeric magic, dude) */
             typedef pair <const int, vector<int>> Int_Pair;
