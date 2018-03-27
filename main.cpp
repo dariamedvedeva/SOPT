@@ -50,14 +50,10 @@ int main() {
     /* Sigma */
     cout << "Sigma computing..." << endl;
     calculation.compute_Sigma();
-    calculation.print_Sigma_in_file();
 
     /* G_final */
     cout << "Dyson equation..." << endl;
     calculation.Dyson_equation();
-
-    calculation.print_GF_in_file();
-    calculation.print_GF0_in_file();
 
     cout << "Start cycle" << endl;
     while(calculation.test_convergency() == false){

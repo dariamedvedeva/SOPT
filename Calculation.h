@@ -140,7 +140,7 @@ public:
 
     bool test_convergency() {
         compare_GF();
-        if (abs(GF[0][0][0][0].imag() - GF_final[0][0][0][0].imag()) < 0.0001) {
+        if (abs(GF[0][0][0][0].imag() - GF_final[0][0][0][0].imag()) < 0.001) {
             return true;
         } else {
             return false;
