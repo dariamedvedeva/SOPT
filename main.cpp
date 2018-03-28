@@ -9,15 +9,23 @@ int main() {
     cout << "ELLO MY QUEEN!" << endl;
 
     int iteration = 0;
-
+    bool half_fill;
+    half_fill = true;
     /* Parameters */
-    float local_coulomb         = 1.0;
-    float nonlocal_exchange     = 0.05;
-    float chemical_potential    = local_coulomb / 2.0;
-    float hopping               = -0.25;
-    float inversive_temperature = 10.0;
+    double local_coulomb         = 1.0;
+    double nonlocal_exchange     = 0.05;
+    double hopping               = -0.25;
+    double inversive_temperature = 10.0;
     int number_of_frequencies   = 10; // number of frequencies
     int number_of_sites         = 4;
+
+    double chemical_potential;
+
+    if (half_fill){
+        chemical_potential    = 0.0;
+    } else {
+        chemical_potential    = local_coulomb / 2.0;
+    }
 
     Data data;
     data.init_parameters(local_coulomb, nonlocal_exchange,

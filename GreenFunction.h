@@ -1,0 +1,14 @@
+//
+// Created by Cooper on 3/28/18.
+//
+
+#ifndef SECON_ORGER_DIAGRAM_SIGMA_GREENFUNCTION_H
+#define SECON_ORGER_DIAGRAM_SIGMA_GREENFUNCTION_H
+
+
+class GreenFunction {
+
+};
+
+
+#endif //SECON_ORGER_DIAGRAM_SIGMA_GREENFUNCTION_H

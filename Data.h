@@ -14,11 +14,11 @@ using namespace std;
 
 class Data {
 private:
-    float U, J, t, mu, beta;
+    double U, J, t, mu, beta;
     int N;
     int number_of_sites, number_of_spins = 2;
     map<int, vector<int> > connections;
-    complex<float> **t_matrix, *omega, *nu, ****U_matrix;
+    complex<double> **t_matrix, *omega, *nu, ****U_matrix;
 
 public:
     Data(){
@@ -31,8 +31,8 @@ public:
         set_number_of_sites(0);
     }
 
-    void init_parameters(float local_coulomb, float nonlocal_exchange, float chemical_potential, float hopping,
-                         float inversive_temperature, int number_of_frequencies, int sites){
+    void init_parameters(double local_coulomb, double nonlocal_exchange, double chemical_potential, double hopping,
+                         double inversive_temperature, int number_of_frequencies, int sites){
         set_U(local_coulomb);
         set_J(nonlocal_exchange);
         set_chemical_potential(chemical_potential);
@@ -55,16 +55,16 @@ public:
     }
 
     void construct_hopping_matrix(){
-        t_matrix = new complex <float> *[get_number_of_sites()];
+        t_matrix = new complex <double> *[get_number_of_sites()];
         for(int i = 0; i < get_number_of_sites(); i++) {
-            t_matrix[i] = new complex<float>[get_number_of_sites()];
+            t_matrix[i] = new complex<double>[get_number_of_sites()];
         }
         for (int i = 0; i < connections.size(); i++){
             for(int j = 0; j < connections.size(); j++){
                 if (i != j){
                     for (int p = 0; p < connections.at(i).size(); p++) {
                         if (j == connections.at(i).at(p)) {
-                            t_matrix[i][j] = complex<float> (get_t(), 0.0);
+                            t_matrix[i][j] = complex<double> (get_t(), 0.0);
                         }
                     }
                 }
@@ -156,8 +156,8 @@ public:
     }
 
     void frequencies(){
-        omega   = new complex<float> [get_number_of_freq()];
-        nu      = new complex<float> [get_number_of_freq()];
+        omega   = new complex<double> [get_number_of_freq()];
+        nu      = new complex<double> [get_number_of_freq()];
         for(int i = 0; i < get_number_of_freq(); i++){
             omega[i]    = fermionic_matsubara(i);
             nu[i]       = bosonic_matsubara(i);
@@ -167,26 +167,26 @@ public:
     void construct_U_matrix() {
         int lat_s = connections.size();
 
-        U_matrix = new complex<float> ***[lat_s];
+        U_matrix = new complex<double> ***[lat_s];
         for (int i = 0; i < lat_s; i++) {
-            U_matrix[i] = new complex<float> **[lat_s];
+            U_matrix[i] = new complex<double> **[lat_s];
             for (int j = 0; j < lat_s; j++) {
-                U_matrix[i][j] = new complex<float> *[lat_s];
+                U_matrix[i][j] = new complex<double> *[lat_s];
                 for (int k = 0; k < lat_s; k++) {
-                    U_matrix[i][j][k] = new complex<float>[lat_s];
+                    U_matrix[i][j][k] = new complex<double>[lat_s];
                     for (int l = 0; l < lat_s; l++) {
-                        U_matrix[i][j][k][l] = complex<float>(get_J(), 0.0);
+                        U_matrix[i][j][k][l] = complex<double>(get_J(), 0.0);
                         if ((i == k) & (j == l) & (i != j)) {
                             for (int p = 0; p < connections.at(i).size(); p++) {
                                 if (j == connections.at(i).at(p)) {
-                                    U_matrix[i][j][k][l] = complex<float>(get_J(), 0.0);
+                                    U_matrix[i][j][k][l] = complex<double>(get_J(), 0.0);
                                     /* Works */
                                     //cout << "Nonlocal: [" << i << "][" << j << "][" << k << "][" << l << "] = " << U_matrix[i][j][k][l] << endl;
                                 }
                             }
                         }
                         if ((i == j) & (i == k) & (i == l)) {
-                            U_matrix[i][j][k][l] = complex<float>(U / 2.0, 0.0);
+                            U_matrix[i][j][k][l] = complex<double>(U, 0.0);
                             /* Works */
                             //cout << "Local: [" << i << "][" << j << "][" << k << "][" << l << "] = " << U_matrix[i][j][k][l] << endl;
                         }
@@ -222,31 +222,31 @@ public:
         cout << endl;
     }
 
-    complex<float> fermionic_matsubara(int n){
-        return float(M_PI * (2 * n + 1) / get_beta()) * complex<float> (0, 1);
+    complex<double> fermionic_matsubara(int n){
+        return double(M_PI * (2 * n + 1) / get_beta()) * complex<double> (0, 1);
     }
 
-    complex<float> bosonic_matsubara(int n){
-        return float(M_PI * 2 * n / get_beta()) * complex<float> (0, 1);
+    complex<double> bosonic_matsubara(int n){
+        return double(M_PI * 2 * n / get_beta()) * complex<double> (0, 1);
     }
 
-    float get_U() const {
+    double get_U() const {
         return U;
     }
 
-    float get_J() const {
+    double get_J() const {
         return J;
     }
 
-    float get_t() const {
+    double get_t() const {
         return t;
     }
 
-    complex<float> get_chemical_potential() const {
-        return complex<float> (mu, 0.0);
+    complex<double> get_chemical_potential() const {
+        return complex<double> (mu, 0.0);
     }
 
-    float get_beta() const {
+    double get_beta() const {
         return beta;
     }
 
@@ -262,41 +262,41 @@ public:
         return number_of_spins;
     }
 
-    complex<float> ****get_U_matrix() const {
+    complex<double> ****get_U_matrix() const {
         return U_matrix;
     }
 
-    complex<float> **get_t_matrix() const {
+    complex<double> **get_t_matrix() const {
         return t_matrix;
     }
 
-    complex<float> *get_omega() const {
+    complex<double> *get_omega() const {
         return omega;
     }
 
-    complex<float> *get_nu() const {
+    complex<double> *get_nu() const {
         return nu;
     }
 
 private:
 
-    void set_U(float local_coulomb){
+    void set_U(double local_coulomb){
         U = local_coulomb;
     }
 
-    void set_J(float nonlocal_exchange){
+    void set_J(double nonlocal_exchange){
         J = nonlocal_exchange;
     }
 
-    void set_chemical_potential(float chemical_potential){
+    void set_chemical_potential(double chemical_potential){
         mu = chemical_potential;
     }
 
-    void set_hopping(float hopping){
+    void set_hopping(double hopping){
         t = hopping;
     }
 
-    void set_beta(float inversive_temperature){
+    void set_beta(double inversive_temperature){
         beta = inversive_temperature;
     }
 
