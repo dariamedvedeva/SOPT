@@ -233,6 +233,31 @@ public:
         len_bos_freq    = data.get_number_of_freq();
         number_of_spins = data.get_number_of_spins();
 
+        vector < vector < vector < vector < std::complex < double > > > > > Um;
+
+        Um.resize(lat_s);
+        for(auto &lvl_1 : Um){
+            lvl_1.resize(lat_s);
+            for(auto &lvl_2 : lvl_1){
+                lvl_2.resize(lat_s);
+                for(auto &lvl_3 : lvl_2){
+                    lvl_3.resize(lat_s);
+                }
+            }
+        }
+
+        for (int i = 0; i < lat_s; i++) {
+            for (int j = 0; j < lat_s; j++) {
+                for (int k = 0; k < lat_s; k++) {
+                    for (int l = 0; l < lat_s; l++) {
+                        Um[i][j][k][l] = data.get_U_matrix()[i][j][k][l];
+                    }
+                }
+            }
+        }
+
+
+
         double beta;
         beta = data.get_beta();
 
@@ -247,7 +272,7 @@ public:
                                 for (int l = 0; l < lat_s; l++) {
                                     for (int omega_n_prime = 0; omega_n_prime < len_ferm_freq; omega_n_prime++) {
                                         Sigma[spin][i][j][omega_n] +=
-                                                data.get_U_matrix()[i][j][k][l] * GF[spin_prime][k][l][omega_n_prime];
+                                                Um[i][j][k][l] * GF[spin_prime][k][l][omega_n_prime];
                                     }
                                 }
                             }
@@ -264,7 +289,7 @@ public:
                                     } else {
                                         GF_tail_kl = complex<double>(1.0, 0.0) / data.fermionic_matsubara(new_freq);
                                     }
-                                    Sigma[spin][i][j][omega_n] -= data.get_U_matrix()[i][k][j][l] * GF_tail_kl;
+                                    Sigma[spin][i][j][omega_n] -= Um[i][k][j][l] * GF_tail_kl;
                                     GF_tail_kl = complex<double>(0.0, 0.0);
                                 }
                             }
@@ -298,8 +323,8 @@ public:
                                                                              data.fermionic_matsubara(new_freq);
                                                             }
                                                             Sigma[spin][i][j][omega_n] +=
-                                                                    data.get_U_matrix()[i][k][n][p] *
-                                                                    data.get_U_matrix()[l][j][q][m] *
+                                                                    Um[i][k][n][p] *
+                                                                    Um[l][j][q][m] *
                                                                     GF_tail_kl * GF_tail_qp *
                                                                     GF[spin_prime][n][m][omega_n_prime] /
                                                                     complex<double>(pow(beta, 2), 0.0);
@@ -339,8 +364,8 @@ public:
                                                     } else {
                                                         GF_left_shift = GF[spin][n][l][-(omega_n - Omega_n)];
                                                     }
-                                                    Sigma[spin][i][j][omega_n] -= data.get_U_matrix()[i][k][n][p] *
-                                                                                  data.get_U_matrix()[l][j][q][m] *
+                                                    Sigma[spin][i][j][omega_n] -= Um[i][k][n][p] *
+                                                                                  Um[l][j][q][m] *
                                                                                   GF_tail_km * GF_left_shift *
                                                                                   GF[spin][q][p][omega_n] /
                                                                                   complex<double>(beta, 0.0);

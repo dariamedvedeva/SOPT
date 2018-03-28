@@ -139,7 +139,6 @@ public:
                             temp.push_back(j);
                         }
                     }
-                    sort(temp.begin(), temp.end());
                     connections.insert(Int_Pair(i, temp));
                     temp.clear();
                 }
@@ -286,7 +285,7 @@ public:
         return number_of_spins;
     }
 
-    vector <vector <vector < vector <complex<double> > > > > get_U_matrix() const {
+    vector <vector <vector < vector <std::complex<double> > > > > get_U_matrix() const {
         return U_matrix;
     }
 
