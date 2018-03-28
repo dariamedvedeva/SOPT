@@ -20,6 +20,7 @@ private:
     map<int, vector<int> > connections;
     complex<double> **t_matrix, *omega, *nu, ****U_matrix;
 
+
 public:
     Data(){
         set_U(0.0);

@@ -7,11 +7,13 @@
 
 #include <iostream>
 #include <complex>
+#include <math.h>
 #include <cmath>
 #include "Data.h"
 //#include <InvertMatrix.h>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
@@ -20,105 +22,84 @@
 #include <boost/numeric/ublas/lu.hpp>
 #include <boost/numeric/ublas/io.hpp>
 
+#include "boost/multi_array.hpp"
+#include <cassert>
+
 using namespace std;
-using namespace boost::numeric::ublas;
+//using namespace boost::numeric::ublas;
 namespace ublas = boost::numeric::ublas;
 
 class Calculation {
-    Data data;
+    //Data data;
 private:
-    //  Data data;
+    Data data;
     int number_of_spins, lat_s, omega_length;
-    complex<double> ****GF,****GF_inversive, ****GF0_inversive, ****GF0, ****GF_final_inversive, ****GF_final, ****Sigma;
+    // Create a 4D array that is 3 x 4 x 2
+ //   typedef boost::multi_array<complex<double >, 4> array_type;
+ //   typedef array_type::index index;
+
     complex<double> One;
+
+    vector< vector < vector < vector <complex<double> > > > > GF;
+    vector< vector < vector < vector <complex<double> > > > > GF0;
+    vector< vector < vector < vector <complex<double> > > > > GF_final;
+    vector< vector < vector < vector <complex<double> > > > > Sigma;
+    vector< vector < vector < vector <complex<double> > > > > GF_inversive;
+    vector< vector < vector < vector <complex<double> > > > > GF0_inversive;
+    vector< vector < vector < vector <complex<double> > > > > GF_final_inversive;
+
+    //complex<double> ****GF,****GF_inversive, ****GF0_inversive, ****GF0, ****GF_final_inversive, ****GF_final, ****Sigma;
+
 public:
     Calculation(const Data &data1) {
 
         data = data1;
-        //construct_data_set(local_coulomb, nonlocal_exchange,
-//                           chemical_potential, hopping,
-//                           inversive_temperature, number_of_frequencies,
-//                           sites);
 
         number_of_spins = data.get_number_of_spins();
         lat_s = data.get_number_of_sites();
         omega_length = data.get_number_of_freq();
 
-        GF                          = new complex<double> ***[number_of_spins];
-        GF_inversive                = new complex<double> ***[number_of_spins];
-        GF0                         = new complex<double> ***[number_of_spins];
-        GF0_inversive               = new complex<double> ***[number_of_spins];
-        Sigma                       = new complex<double> ***[number_of_spins];
-        GF_final_inversive          = new complex<double> ***[number_of_spins];
-        GF_final                    = new complex<double> ***[number_of_spins];
-
-        for (int spin = 0; spin < number_of_spins; spin++) {
-            GF[spin] = new complex<double> **[lat_s];
-            GF_inversive[spin] = new complex<double> **[lat_s];
-            GF0[spin] = new complex<double> **[lat_s];
-            GF0_inversive[spin] = new complex<double> **[lat_s];
-            Sigma[spin] = new complex<double> **[lat_s];
-            GF_final_inversive[spin] = new complex<double> **[lat_s];
-            GF_final[spin] = new complex<double> **[lat_s];
-
-            for (int i = 0; i < lat_s; i++) {
-                GF[spin][i] = new complex<double> *[lat_s];
-                GF_inversive[spin][i] = new complex<double> *[lat_s];
-                GF0[spin][i] = new complex<double> *[lat_s];
-                GF0_inversive[spin][i] = new complex<double> *[lat_s];
-                Sigma[spin][i] = new complex<double> *[lat_s];
-                GF_final_inversive[spin][i] = new complex<double> *[lat_s];
-                GF_final[spin][i] = new complex<double> *[lat_s];
-
-                for (int j = 0; j < lat_s; j++) {
-                    GF[spin][i][j] = new complex<double>[omega_length];
-                    GF_inversive[spin][i][j] = new complex<double>[omega_length];
-                    GF0[spin][i][j] = new complex<double>[omega_length];
-                    GF0_inversive[spin][i][j] = new complex<double>[omega_length];
-                    Sigma[spin][i][j] = new complex<double>[omega_length];
-                    GF_final_inversive[spin][i][j] = new complex<double>[omega_length];
-                    GF_final[spin][i][j] = new complex<double>[omega_length];
-
-                    for (int freq = 0; freq < omega_length; freq++) {
-                        GF[spin][i][j][freq] = complex<double>(0.0, 0.0);
-                        GF_inversive[spin][i][j][freq] = complex<double>(0.0, 0.0);
-                        GF0[spin][i][j][freq] = complex<double>(0.0, 0.0);
-                        GF0_inversive[spin][i][j][freq] = complex<double>(0.0, 0.0);
-                        Sigma[spin][i][j][freq] = complex<double>(0.0, 0.0);
-                        GF_final_inversive[spin][i][j][freq] = complex<double>(0.0, 0.0);
-                        GF_final[spin][i][j][freq] = complex<double>(0.0, 0.0);
-                    }
-                }
-            }
-        }
+        cout << number_of_spins << ", " << lat_s << ", " << omega_length << endl;
+        GF[0][0][0][0]            = std::complex <double > (0.0, 0.0);
+//        for (int spin = 0; spin < number_of_spins; spin++) {
+//            for (int i = 0; i < lat_s; i++) {
+//                for (int j = 0; j < lat_s; j++) {
+//                    for (int freq = 0; freq < omega_length; freq++) {
+//                        GF[spin][i][j][freq]            = std::complex <double > (0.0, 0.0);
+////                        GF_inversive[spin][i][j][freq]  = std::complex <double >(0.0, 0.0);
+////                        GF0[spin][i][j][freq]           = std::complex <double >(0.0, 0.0);
+////                        GF0_inversive[spin][i][j][freq] = std::complex <double >(0.0, 0.0);
+////                        Sigma[spin][i][j][freq]         = std::complex <double >(0.0, 0.0);
+////                        GF_final_inversive[spin][i][j][freq] = std::complex <double >(0.0, 0.0);
+////                        GF_final[spin][i][j][freq]      = std::complex <double >(0.0, 0.0);
+//                    }
+//                }
+//            }
+//        }
     }
 
-    complex<double> ****get_GF() const {
+    vector < vector < vector < vector <complex<double> > > > > get_GF() const {
         return GF;
     }
 
-    complex<double> ****get_GF0() const {
+    vector < vector < vector < vector <complex<double> > > > > get_GF0_inversive() const {
         return GF0_inversive;
     }
 
-    complex<double> ****get_Sigma() const {
+    vector < vector < vector < vector <complex<double> > > > > get_Sigma() const {
         return Sigma;
     }
 
-    complex<double> ****get_GF_final() const {
+    vector < vector < vector < vector <complex<double> > > > > get_GF_final_inversive() const {
         return GF_final_inversive;
     }
 
     void construct_initial_lattice_function() {
         One = complex<double>(1.0, 0.0);
         complex<double> temp;
-        GF0_inversive = new complex<double> ***[number_of_spins];
         for (int spin = 0; spin < number_of_spins; spin++) {
-            GF0_inversive[spin] = new complex<double> **[lat_s];
             for (int i = 0; i < lat_s; i++) {
-                GF0_inversive[spin][i] = new complex<double> *[lat_s];
                 for (int j = 0; j < lat_s; j++) {
-                    GF0_inversive[spin][i][j] = new complex<double>[omega_length];
                     for (int freq = 0; freq < omega_length; freq++) {
                         if (i == j) {
                             temp = data.get_omega()[freq] + data.get_chemical_potential();
@@ -394,43 +375,43 @@ public:
 
     }
 
-    void clean_memory_GF(){
-
-        for(int spin = 0; spin < number_of_spins; spin++) {
-            for (int i = 0; i < lat_s; i++){
-                for(int j = 0; j < lat_s; j++){
-                    delete[] GF[spin][i][j];
-                    delete[] GF_inversive[spin][i][j];
-                    delete[] GF0[spin][i][j];
-                    delete[] GF0_inversive[spin][i][j];
-                    delete[] GF_final_inversive[spin][i][j];
-                    delete[] GF_final[spin][i][j];
-                    delete[] Sigma[spin][i][j];
-                }
-                delete[] GF[spin][i];
-                delete[] GF_inversive[spin][i];
-                delete[] GF0[spin][i];
-                delete[] GF0_inversive[spin][i];
-                delete[] GF_final_inversive[spin][i];
-                delete[] GF_final[spin][i];
-                delete[] Sigma[spin][i];
-            }
-            delete[] GF[spin];
-            delete[] GF_inversive[spin];
-            delete[] GF0[spin];
-            delete[] GF0_inversive[spin];
-            delete[] GF_final_inversive[spin];
-            delete[] GF_final[spin];
-            delete[] Sigma[spin];
-        }
-        delete[] GF;
-        delete[] GF_inversive;
-        delete[] GF0;
-        delete[] GF0_inversive;
-        delete[] GF_final_inversive;
-        delete[] GF_final;
-        delete[] Sigma;
-    }
+//    void clean_memory_GF(){
+//
+//        for(int spin = 0; spin < number_of_spins; spin++) {
+//            for (int i = 0; i < lat_s; i++){
+//                for(int j = 0; j < lat_s; j++){
+//                    delete[] GF[spin][i][j];
+//                    delete[] GF_inversive[spin][i][j];
+//                    delete[] GF0[spin][i][j];
+//                    delete[] GF0_inversive[spin][i][j];
+//                    delete[] GF_final_inversive[spin][i][j];
+//                    delete[] GF_final[spin][i][j];
+//                    delete[] Sigma[spin][i][j];
+//                }
+//                delete[] GF[spin][i];
+//                delete[] GF_inversive[spin][i];
+//                delete[] GF0[spin][i];
+//                delete[] GF0_inversive[spin][i];
+//                delete[] GF_final_inversive[spin][i];
+//                delete[] GF_final[spin][i];
+//                delete[] Sigma[spin][i];
+//            }
+//            delete[] GF[spin];
+//            delete[] GF_inversive[spin];
+//            delete[] GF0[spin];
+//            delete[] GF0_inversive[spin];
+//            delete[] GF_final_inversive[spin];
+//            delete[] GF_final[spin];
+//            delete[] Sigma[spin];
+//        }
+//        delete[] GF;
+//        delete[] GF_inversive;
+//        delete[] GF0;
+//        delete[] GF0_inversive;
+//        delete[] GF_final_inversive;
+//        delete[] GF_final;
+//        delete[] Sigma;
+//    }
 
     template<class T>
     bool InvertMatrix (const ublas::matrix<T>& input, ublas::matrix<T>& inverse) {
@@ -455,26 +436,27 @@ public:
         int size = 2;
         bool inverted;
 
-        matrix<double> start_matrix(size, size);
+        ublas::matrix< std::complex<double> > start_matrix(size, size);
+        //cout << complex<double > (3.0, 1.0);
 
-        start_matrix(0, 0) = 3.0;
-        start_matrix(0, 1) = 4.0;
-        start_matrix(1, 0) = 5.0;
-        start_matrix(1, 1) = 6.0;
-
-        matrix<double> inversion(size, size);
-
-        inverted = InvertMatrix(start_matrix, inversion);
-        cout << start_matrix << endl;
-        cout << inversion << endl;
+        start_matrix(0, 0) = std::complex< double > (3.0, 1.0);
+        //start_matrix(0, 1) = (4.0, 1.0);
+//        start_matrix(1, 0) = (5.0, 1.0);
+//        start_matrix(1, 1) = (6.0, 1.0);
+//
+//        ublas::matrix<std::complex <double>> inversion(size, size);
+//
+//        inverted = InvertMatrix(start_matrix, inversion);
+//        cout << start_matrix << endl;
+//        cout << inversion << endl;
 
     }
 
     void inverse_matrix_to_G0(){
         bool inverted;
 
-        matrix<complex<double>> start_matrix(lat_s, lat_s);
-        matrix<complex<double>> inversion(lat_s, lat_s);
+        ublas::matrix< std::complex<double> > start_matrix(lat_s, lat_s);
+        ublas::matrix< std::complex<double> > inversion(lat_s, lat_s);
 
         for(int spin = 0; spin < number_of_spins; spin++){
             for(int freq = 0; freq < omega_length; freq++){
@@ -496,8 +478,8 @@ public:
     void inverse_matrix_to_GF_final(){
         bool inverted;
 
-        matrix<complex<double>> start_matrix(lat_s, lat_s);
-        matrix<complex<double>> inversion(lat_s, lat_s);
+        ublas::matrix< std::complex<double> > start_matrix(lat_s, lat_s);
+        ublas::matrix< std::complex<double> > inversion(lat_s, lat_s);
 
         for(int spin = 0; spin < number_of_spins; spin++){
             for(int freq = 0; freq < omega_length; freq++){
@@ -516,28 +498,28 @@ public:
         }
     }
 
-    void inverse_matrix_GF(){
-        bool inverted;
-
-        matrix<complex<double>> start_matrix(lat_s, lat_s);
-        matrix<complex<double>> inversion(lat_s, lat_s);
-
-        for(int spin = 0; spin < number_of_spins; spin++){
-            for(int freq = 0; freq < omega_length; freq++){
-                for(int i = 0; i < lat_s; i++){
-                    for(int j = 0; j < lat_s; j++){
-                        start_matrix(i, j) = GF[spin][i][j][freq];
-                    }
-                }
-                inverted = InvertMatrix(start_matrix, inversion);
-                for(int i = 0; i < lat_s; i++){
-                    for(int j = 0; j < lat_s; j++){
-                        GF_inversive[spin][i][j][freq] = inversion(i, j);
-                    }
-                }
-            }
-        }
-    }
+//    void inverse_matrix_GF(){
+//        bool inverted;
+//
+//        matrix<complex<double>> start_matrix(lat_s, lat_s);
+//        matrix<complex<double>> inversion(lat_s, lat_s);
+//
+//        for(int spin = 0; spin < number_of_spins; spin++){
+//            for(int freq = 0; freq < omega_length; freq++){
+//                for(int i = 0; i < lat_s; i++){
+//                    for(int j = 0; j < lat_s; j++){
+//                        start_matrix(i, j) = GF[spin][i][j][freq];
+//                    }
+//                }
+//                inverted = InvertMatrix(start_matrix, inversion);
+//                for(int i = 0; i < lat_s; i++){
+//                    for(int j = 0; j < lat_s; j++){
+//                        GF_inversive[spin][i][j][freq] = inversion(i, j);
+//                    }
+//                }
+//            }
+//        }
+//    }
 };
 
 

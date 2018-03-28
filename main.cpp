@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Data.h"
+//#include "GreenFunction.h"
 #include "Calculation.h"
 
 using namespace std;
@@ -49,45 +50,51 @@ int main() {
 
     cout << "Zero iteration." << endl;
 
-    /* G0 */
-    calculation.construct_initial_lattice_function();
+//    calculation.inverse_matrix();
 
-    /* GF = G0 */
-    calculation.GF_takes_GO();
-
-    /* Sigma */
-    cout << "Sigma computing..." << endl;
-    calculation.compute_Sigma();
-
-    /* G_final */
-    cout << "Dyson equation..." << endl;
-    calculation.Dyson_equation();
-
-    cout << "Start cycle" << endl;
-    while(calculation.test_convergency() == false){
-        iteration += 1;
-        cout << "Iteration number " << iteration << endl;
-
-        /* GF = GF_final*/
-        calculation.GF_takes_GF_final(); /* and inversive matrix too*/
-
-        /* Sigma */
-        cout << "Sigma computing..." << endl;
-        calculation.compute_Sigma();
-        /* GF_final */
-        cout << "Dyson equation..." << endl;
-        calculation.Dyson_equation();
-    }
-
-
-    calculation.print_Sigma_in_file();
-    calculation.print_GF_in_file();
-    calculation.print_GF0_in_file();
+//    GreenFunction GF0(data);
+//    cout << GF0.getGreen_function().;
+//
+//
+//    /* G0 */
+//    calculation.construct_initial_lattice_function();
+//
+//    /* GF = G0 */
+//    calculation.GF_takes_GO();
+//
+//    /* Sigma */
+//    cout << "Sigma computing..." << endl;
+//    calculation.compute_Sigma();
+//
+//    /* G_final */
+//    cout << "Dyson equation..." << endl;
+//    calculation.Dyson_equation();
+//
+//    cout << "Start cycle" << endl;
+//    while(calculation.test_convergency() == false){
+//        iteration += 1;
+//        cout << "Iteration number " << iteration << endl;
+//
+//        /* GF = GF_final*/
+//        calculation.GF_takes_GF_final(); /* and inversive matrix too*/
+//
+//        /* Sigma */
+//        cout << "Sigma computing..." << endl;
+//        calculation.compute_Sigma();
+//        /* GF_final */
+//        cout << "Dyson equation..." << endl;
+//        calculation.Dyson_equation();
+//    }
+//
+//    calculation.GF_takes_GF_final();
+//
+//    calculation.print_Sigma_in_file();
+//    calculation.print_GF_in_file();
+//    calculation.print_GF0_in_file();
     cout << "Total number of iterations = " << iteration << endl;
     data.clear_memory_t_matrix();
 
     /*Memory clean block*/
-    //calculation.clean_memory_GF();
     cout << "END" << endl;
     return 0;
 }
