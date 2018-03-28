@@ -34,9 +34,6 @@ class Calculation {
 private:
     Data data;
     int number_of_spins, lat_s, omega_length;
-    // Create a 4D array that is 3 x 4 x 2
- //   typedef boost::multi_array<complex<double >, 4> array_type;
- //   typedef array_type::index index;
 
     complex<double> One;
 
@@ -48,8 +45,6 @@ private:
     vector< vector < vector < vector <complex<double> > > > > GF0_inversive;
     vector< vector < vector < vector <complex<double> > > > > GF_final_inversive;
 
-    //complex<double> ****GF,****GF_inversive, ****GF0_inversive, ****GF0, ****GF_final_inversive, ****GF_final, ****Sigma;
-
 public:
     Calculation(const Data &data1) {
 
@@ -60,22 +55,105 @@ public:
         omega_length = data.get_number_of_freq();
 
         cout << number_of_spins << ", " << lat_s << ", " << omega_length << endl;
-        GF[0][0][0][0]            = std::complex <double > (0.0, 0.0);
-//        for (int spin = 0; spin < number_of_spins; spin++) {
-//            for (int i = 0; i < lat_s; i++) {
-//                for (int j = 0; j < lat_s; j++) {
-//                    for (int freq = 0; freq < omega_length; freq++) {
-//                        GF[spin][i][j][freq]            = std::complex <double > (0.0, 0.0);
-////                        GF_inversive[spin][i][j][freq]  = std::complex <double >(0.0, 0.0);
-////                        GF0[spin][i][j][freq]           = std::complex <double >(0.0, 0.0);
-////                        GF0_inversive[spin][i][j][freq] = std::complex <double >(0.0, 0.0);
-////                        Sigma[spin][i][j][freq]         = std::complex <double >(0.0, 0.0);
-////                        GF_final_inversive[spin][i][j][freq] = std::complex <double >(0.0, 0.0);
-////                        GF_final[spin][i][j][freq]      = std::complex <double >(0.0, 0.0);
-//                    }
-//                }
-//            }
-//        }
+
+        resize_functions(number_of_spins, lat_s, omega_length);
+        cout << GF0.size() << endl;
+
+        for (int spin = 0; spin < number_of_spins; spin++) {
+            for (int i = 0; i < lat_s; i++) {
+                for (int j = 0; j < lat_s; j++) {
+                    for (int freq = 0; freq < omega_length; freq++) {
+                        GF[spin][i][j][freq]            = std::complex <double > (0.0, 0.0);
+                        GF_inversive[spin][i][j][freq]  = std::complex <double >(0.0, 0.0);
+                        GF0[spin][i][j][freq]           = std::complex <double >(0.0, 0.0);
+                        GF0_inversive[spin][i][j][freq] = std::complex <double >(0.0, 0.0);
+                        Sigma[spin][i][j][freq]         = std::complex <double >(0.0, 0.0);
+                        GF_final_inversive[spin][i][j][freq] = std::complex <double >(0.0, 0.0);
+                        GF_final[spin][i][j][freq]      = std::complex <double >(0.0, 0.0);
+                    }
+                }
+            }
+        }
+    }
+
+    void resize_functions(int spins, int lattice_size, int frequencies){
+
+        GF0.resize(number_of_spins);
+        for(auto &lvl_1 : GF0){
+            lvl_1.resize(lat_s);
+            for(auto &lvl_2 : lvl_1){
+                lvl_2.resize(lat_s);
+                for(auto &lvl_3 : lvl_2){
+                    lvl_3.resize(omega_length);
+                }
+            }
+        }
+
+        GF.resize(number_of_spins);
+        for(auto &lvl_1 : GF){
+            lvl_1.resize(lat_s);
+            for(auto &lvl_2 : lvl_1){
+                lvl_2.resize(lat_s);
+                for(auto &lvl_3 : lvl_2){
+                    lvl_3.resize(omega_length);
+                }
+            }
+        }
+
+        GF_final.resize(number_of_spins);
+        for(auto &lvl_1 : GF_final){
+            lvl_1.resize(lat_s);
+            for(auto &lvl_2 : lvl_1){
+                lvl_2.resize(lat_s);
+                for(auto &lvl_3 : lvl_2){
+                    lvl_3.resize(omega_length);
+                }
+            }
+        }
+
+        Sigma.resize(number_of_spins);
+        for(auto &lvl_1 : Sigma){
+            lvl_1.resize(lat_s);
+            for(auto &lvl_2 : lvl_1){
+                lvl_2.resize(lat_s);
+                for(auto &lvl_3 : lvl_2){
+                    lvl_3.resize(omega_length);
+                }
+            }
+        }
+
+        GF0_inversive.resize(number_of_spins);
+        for(auto &lvl_1 : GF0_inversive){
+            lvl_1.resize(lat_s);
+            for(auto &lvl_2 : lvl_1){
+                lvl_2.resize(lat_s);
+                for(auto &lvl_3 : lvl_2){
+                    lvl_3.resize(omega_length);
+                }
+            }
+        }
+
+        GF_inversive.resize(number_of_spins);
+        for(auto &lvl_1 : GF_inversive){
+            lvl_1.resize(lat_s);
+            for(auto &lvl_2 : lvl_1){
+                lvl_2.resize(lat_s);
+                for(auto &lvl_3 : lvl_2){
+                    lvl_3.resize(omega_length);
+                }
+            }
+        }
+
+        GF_final_inversive.resize(number_of_spins);
+        for(auto &lvl_1 : GF_final_inversive){
+            lvl_1.resize(lat_s);
+            for(auto &lvl_2 : lvl_1){
+                lvl_2.resize(lat_s);
+                for(auto &lvl_3 : lvl_2){
+                    lvl_3.resize(omega_length);
+                }
+            }
+        }
     }
 
     vector < vector < vector < vector <complex<double> > > > > get_GF() const {
@@ -146,13 +224,13 @@ public:
         int lat_s, len_ferm_freq, len_bos_freq, number_of_spins;
         int new_freq, new_freq_2;
         complex<double> GF_tail_kl, GF_tail_qp, GF_tail_km, GF_left_shift;
-        GF_tail_kl = complex<double>(0.0, 0.0);
-        GF_tail_qp = complex<double>(0.0, 0.0);
-        GF_tail_km = complex<double>(0.0, 0.0);
-        GF_left_shift = complex<double>(0.0, 0.0);
-        lat_s = data.get_number_of_sites();
-        len_ferm_freq = data.get_number_of_freq();
-        len_bos_freq = data.get_number_of_freq();
+        GF_tail_kl      = complex<double>(0.0, 0.0);
+        GF_tail_qp      = complex<double>(0.0, 0.0);
+        GF_tail_km      = complex<double>(0.0, 0.0);
+        GF_left_shift    = complex<double>(0.0, 0.0);
+        lat_s           = data.get_number_of_sites();
+        len_ferm_freq   = data.get_number_of_freq();
+        len_bos_freq    = data.get_number_of_freq();
         number_of_spins = data.get_number_of_spins();
 
         double beta;
@@ -440,9 +518,9 @@ public:
         //cout << complex<double > (3.0, 1.0);
 
         start_matrix(0, 0) = std::complex< double > (3.0, 1.0);
-        //start_matrix(0, 1) = (4.0, 1.0);
-//        start_matrix(1, 0) = (5.0, 1.0);
-//        start_matrix(1, 1) = (6.0, 1.0);
+        start_matrix(0, 1) = std::complex< double > (4.0, 1.0);
+        start_matrix(1, 0) = std::complex< double > (5.0, 1.0);
+        start_matrix(1, 1) = std::complex< double > (6.0, 1.0);
 //
 //        ublas::matrix<std::complex <double>> inversion(size, size);
 //

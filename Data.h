@@ -18,8 +18,9 @@ private:
     int N;
     int number_of_sites, number_of_spins = 2;
     map<int, vector<int> > connections;
-    complex<double> **t_matrix, *omega, *nu, ****U_matrix;
-
+    vector < std :: complex < double > > omega, nu;
+    vector < vector < std::complex < double > > > t_matrix;
+    vector < vector < vector < vector < std::complex < double > > > > > U_matrix;
 
 public:
     Data(){
@@ -56,16 +57,25 @@ public:
     }
 
     void construct_hopping_matrix(){
-        t_matrix = new complex <double> *[get_number_of_sites()];
-        for(int i = 0; i < get_number_of_sites(); i++) {
-            t_matrix[i] = new complex<double>[get_number_of_sites()];
+        int size = connections.size();
+        t_matrix.resize(size);
+        for(auto &lvl_1 : t_matrix){
+            lvl_1.resize(size);
         }
-        for (int i = 0; i < connections.size(); i++){
-            for(int j = 0; j < connections.size(); j++){
+
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                t_matrix[i][j] = std::complex<double> (0.0, 0.0);
+            }
+        }
+
+
+        for (int i = 0; i < size; i++){
+            for(int j = 0; j < size; j++){
                 if (i != j){
                     for (int p = 0; p < connections.at(i).size(); p++) {
                         if (j == connections.at(i).at(p)) {
-                            t_matrix[i][j] = complex<double> (get_t(), 0.0);
+                            t_matrix[i][j] = std::complex<double> (get_t(), 0.0);
                         }
                     }
                 }
@@ -149,32 +159,45 @@ public:
         }
     }
 
-    void clear_memory_t_matrix(){
-        for(int i; i < get_number_of_sites(); i++) {
-            delete[] t_matrix[i];
-        }
-        delete[] t_matrix;
-    }
-
     void frequencies(){
-        omega   = new complex<double> [get_number_of_freq()];
-        nu      = new complex<double> [get_number_of_freq()];
+        int frequencies = get_number_of_freq();
+        omega.resize(frequencies, std::complex<double> (0.0, 0.0));
+        nu.resize(frequencies, std::complex<double> (0.0, 0.0));
+
         for(int i = 0; i < get_number_of_freq(); i++){
             omega[i]    = fermionic_matsubara(i);
             nu[i]       = bosonic_matsubara(i);
         }
+
     }
 
     void construct_U_matrix() {
         int lat_s = connections.size();
 
-        U_matrix = new complex<double> ***[lat_s];
+        U_matrix.resize(lat_s);
+        for(auto &lvl_1 : U_matrix){
+            lvl_1.resize(lat_s);
+            for(auto &lvl_2 : lvl_1){
+                lvl_2.resize(lat_s);
+                for(auto &lvl_3 : lvl_2){
+                    lvl_3.resize(lat_s);
+                }
+            }
+        }
+
         for (int i = 0; i < lat_s; i++) {
-            U_matrix[i] = new complex<double> **[lat_s];
             for (int j = 0; j < lat_s; j++) {
-                U_matrix[i][j] = new complex<double> *[lat_s];
                 for (int k = 0; k < lat_s; k++) {
-                    U_matrix[i][j][k] = new complex<double>[lat_s];
+                    for (int l = 0; l < lat_s; l++) {
+                        U_matrix[i][j][k][l] = std::complex <double> (0.0, 0.0);
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < lat_s; i++) {
+            for (int j = 0; j < lat_s; j++) {
+                for (int k = 0; k < lat_s; k++) {
                     for (int l = 0; l < lat_s; l++) {
                         U_matrix[i][j][k][l] = complex<double>(get_J(), 0.0);
                         if ((i == k) & (j == l) & (i != j)) {
@@ -263,19 +286,19 @@ public:
         return number_of_spins;
     }
 
-    complex<double> ****get_U_matrix() const {
+    vector <vector <vector < vector <complex<double> > > > > get_U_matrix() const {
         return U_matrix;
     }
 
-    complex<double> **get_t_matrix() const {
+    vector < vector <std::complex < double > > > get_t_matrix() const {
         return t_matrix;
     }
 
-    complex<double> *get_omega() const {
+    vector <complex<double>> get_omega() const {
         return omega;
     }
 
-    complex<double> *get_nu() const {
+    vector <complex<double>> get_nu() const {
         return nu;
     }
 
